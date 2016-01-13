@@ -68,7 +68,7 @@ class Cursor
         // convert array to Entities collection
         $_ = [];
         foreach ($res as $data) {
-            $_ = (new Entity([], $this->client))->setData($data);
+            $_[] = (new Entity([], $this->client))->setData($data);
         }
         return $_;
     }
