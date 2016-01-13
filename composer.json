@@ -1,5 +1,5 @@
 {
-  "name" : "arrowsphere/client",
+  "name" : "crapougnax/client",
   "description" : "PHP clients for the Arrowsphere API",
   "version" : "0.1.0",
   "require" : {
