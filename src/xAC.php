@@ -48,7 +48,11 @@ class xAC
      */
     static protected $services = [];
     
-    protected $lastResponse;
+    /**
+     * Last API response as array
+     * @var array
+     */
+    protected $lastResponse = [];
     
     /**
      * HTTP Transport
@@ -166,6 +170,11 @@ class xAC
         $this->lastResponse = $response;
         
         return $response['body']['data'];
+    }
+    
+    public function getLastResponse()
+    {
+        return $this->lastResponse;
     }
     
     public static function getInstance()

@@ -23,7 +23,11 @@ class Cursor
     
     protected $perpage = 15;
     
-    protected $meta = [];
+    /**
+     * Pagination data related to the current state
+     * @var array
+     */
+    protected $pagination = [];
     
     
     /**
@@ -64,12 +68,17 @@ class Cursor
         }
         
         $res = $this->client->call($uri, 'GET');
+
+        // get and preserve pagination
+        $lr = $this->client->getLastResponse();
+        $this->pagination = isset($lr['body']) && isset($lr['body']['pagination']) ? $lr['body']['pagination'] : [];
         
         // convert array to Entities collection
         $_ = [];
         foreach ($res as $data) {
             $_[] = (new Entity([], $this->client))->setData($data);
         }
+        
         return $_;
     }
     
@@ -81,6 +90,16 @@ class Cursor
         
         return $this;
     }
+    
+    /**
+     * Return the pagination data related to the current batch
+     * @return array
+     */
+    public function getPagination()
+    {
+        return $this->pagination;
+    }
+    
     
     public function addFilter($field, $value, $operator= '=')
     {
