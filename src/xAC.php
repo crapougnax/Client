@@ -148,17 +148,13 @@ class xAC
             $res = $this->transport->request($method, $endpoint);
             
         } catch (ConnectException $e) {
-            //Log::critical("Unable to connect to " . $url);
-            throw new \Exception(500, 999, $e);
+            throw new \Exception($e->getMessage());
         
         } catch (ServerException $e) {
-            $retdata = json_decode($e->getResponse()->getBody()->getContents());
-            //Log::critical("Server error: " . $retdata->error);
-            throw new \Exception($retdata->error, $e->getResponse()->getStatusCode(), $e);
+            throw new \Exception($e->getMessage());
         
         } catch (ClientException $e) {
-          //  Log::critical("Client error: " . $e->getMessage());
-            throw new \Exception(400, 999, $e);
+            throw new \Exception($e->getMessage());
              
         } finally {
             if (isset($res)) {

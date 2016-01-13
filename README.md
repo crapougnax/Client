@@ -10,9 +10,9 @@ use Arrowsphere\Client\xAC as Client;
 
 Client::setApiKey('MySecretApiKeyThatNobodyKnowsAbout');
 
-Client::setBaseUrl('https://xac.arrowsphereconnect.com/api/');
+Client::setApiBaseUrl('https://xac.arrowsphereconnect.com/api/');
 
-Client::setVersion(2); // 1 and 2 (default) are valid versions
+Client::setApiVersion(2); // 1 and 2 (default) are valid versions
 ```
 
 ## Cursors
