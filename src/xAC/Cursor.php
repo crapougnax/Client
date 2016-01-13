@@ -82,6 +82,12 @@ class Cursor
         return $_;
     }
     
+    public function setPage($page)
+    {
+        $this->page = $page;
+        return $this;
+    }
+    
     public function setPerPage($perpage)
     {
         if ($perpage > 0) {
