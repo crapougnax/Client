@@ -3,6 +3,7 @@
 namespace Arrowsphere\Client\xAC;
 
 use Arrowsphere\Client\xAC as Client;
+use Arrowsphere\Client\xAC\Entity\Action;
 
 trait MagicFactoryTrait {
     
@@ -20,8 +21,6 @@ trait MagicFactoryTrait {
         if (array_key_exists($name, $services)) {
             $service = $services[$name];
 
-         // var_Dump($service, $name);
-            
             switch ($service['type']) {
     
                 case 'collection':
@@ -37,6 +36,15 @@ trait MagicFactoryTrait {
                         $service, 
                         Client::getInstance(), 
                         isset($arguments[0]) ? $arguments[0] : null
+                    );
+                    break;
+                
+                // $name represents an action on an entity
+                case 'action':
+                    return new Action(
+                        $service,
+                        $arguments['context'],
+                        Client::getInstance()
                     );
                     break;
     

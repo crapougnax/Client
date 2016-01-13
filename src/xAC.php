@@ -145,11 +145,18 @@ class xAC
      * @throws \Exception
      * @return array
      */
-    public function call($endpoint, $method = 'GET')
+    public function call($endpoint, $method = 'GET', array $data = [])
     {
         try {
             $this->initTransport();
-            $res = $this->transport->request($method, $endpoint);
+            $res = $this->transport->request(
+                $method, 
+                $endpoint, 
+                [
+                    'json' => $data,
+                    
+                ]
+            );
             
         } catch (ConnectException $e) {
             throw new \Exception($e->getMessage());
