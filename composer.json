@@ -1,0 +1,26 @@
+{
+  "name" : "arrowsphere/client",
+  "description" : "PHP clients for the Arrowsphere API",
+  "version" : "0.1.0",
+  "require" : {
+    "php" : ">=5.5.0",
+    "guzzlehttp/guzzle" : "6.1.*"
+  },
+  "repositories" : [ {
+    "type" : "composer",
+    "url" : "https://packagist.org/"
+  } ],
+  "license" : "MIT",
+  "autoload" : {
+    "psr-4" : {
+      "Arrowsphere\\Client\\" : "src"
+    }
+  },
+  "type" : "library",
+  "homepage" : "https://github.com/Arrowsphere/Client",
+  "authors" : [ {
+    "name" : "Olivier Lépine",
+    "email" : "olivier@lepine.fr"
+  } ],
+  "prefer-stable" : true
+}

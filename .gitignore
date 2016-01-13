@@ -1,0 +1,8 @@
+/vendor/
+/.project
+/.buildpath
+/.settings/
+.idea/*
+/composer.lock
+.phpstorm.meta.php
+/my-*.php
