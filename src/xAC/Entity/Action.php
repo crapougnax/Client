@@ -13,7 +13,7 @@ class Action
     
     protected $client;
     
-    protected $data;
+    protected $data = [];
     
     
     public function __construct(array $params, Entity $entity, Client $client)
@@ -32,6 +32,11 @@ class Action
     
     public function execute()
     {
+        // Check that payload exists
+        if (in_array($this->params['method'], ['POST','PUT','PATCH']) && count($this->data) == 0) {
+            throw new \Exception("Can't execute action without some data");    
+        }
+        
         // Build URI
         $uri = $this->entity->getBaseUri();
         if ($this->params['endpoint'] != 'default') {
@@ -45,6 +50,7 @@ class Action
                 $this->data
             );
         } catch (\Exception $e) {
+            var_dump($e->getMessage());
             return false;
         }
         

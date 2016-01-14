@@ -154,18 +154,17 @@ class xAC
         
         try {
             $this->initTransport();
-            $res = $this->transport->request(
-                $method, 
-                $endpoint, 
-                $params
-            );
+            $res = $this->transport->request($method, $endpoint, $params);
         } catch (ConnectException $e) {
             throw new \Exception($e->getMessage());
         
         } catch (ServerException $e) {
-            throw new \Exception($e->getMessage());
+            $response = json_decode((string) $e->getResponse()->getBody(), true);
+            $this->lastResponse = $response['ACResponse'];
+            throw new \Exception($this->lastResponse['message']);
         
         } catch (ClientException $e) {
+            $this->lastResponse = [];
             throw new \Exception($e->getMessage());
              
         } finally {
