@@ -162,13 +162,13 @@ class xAC
             $response = json_decode((string) $e->getResponse()->getBody(), true);
             self::$lastResponse = $response['ACResponse'];
             self::$lastResponse['httpCode'] = $e->getResponse()->getStatusCode();
-            throw new \Exception($this->lastResponse['message']);
+            throw new \Exception(self::$lastResponse['message']);
         
         } catch (ClientException $e) {
             $response = json_decode((string) $e->getResponse()->getBody(), true);
             self::$lastResponse = $response['ACResponse'];
             self::$lastResponse['httpCode'] = $e->getResponse()->getStatusCode();
-            throw new \Exception($this->lastResponse['message']);
+            throw new \Exception(self::$lastResponse['message']);
              
         } finally {
             if (isset($res)) {
