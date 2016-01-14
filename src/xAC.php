@@ -61,10 +61,20 @@ class xAC
     protected $transport;
     
     
-    public function __construct($key = null, $version = null)
+    /**
+     * Class constructor
+     * @param string $key
+     * @param string $url
+     * @param $version $version
+     */
+    public function __construct($key = null, $url = null, $version = null)
     {
         if (! is_null($key)) {
             self::setApiKey($key);
+        }
+
+        if (! is_null($url)) {
+            self::setApiBaseUrl($url);
         }
         
         if (! is_null($version)) {
@@ -121,8 +131,9 @@ class xAC
     }
     
     /**
-     * 
+     * Return the available services as array (or actions if the $entity param is filled)
      * @param xAC\Entity $entity
+     * @return array
      */
     public static function getServices(xAC\Entity $entity = null)
     {
@@ -142,6 +153,7 @@ class xAC
      * Make a HTTP Request and return response
      * @param string $endpoint
      * @param string $method
+     * @param array  $data
      * @throws \Exception
      * @return array
      */
@@ -183,11 +195,19 @@ class xAC
         return $response['body']['data'];
     }
     
+    /**
+     * Return server last response as array
+     * @return array
+     */
     public static function getLastResponse()
     {
         return self::$lastResponse;
     }
     
+    /**
+     * Return a singleton instance of the class
+     * @return Arrowsphere\Client\xAC
+     */
     public static function getInstance()
     {
         if (is_null(self::$client)) {
