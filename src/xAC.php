@@ -52,7 +52,7 @@ class xAC
      * Last API response as array
      * @var array
      */
-    protected $lastResponse = [];
+    static protected $lastResponse = [];
     
     /**
      * HTTP Transport
@@ -160,11 +160,11 @@ class xAC
         
         } catch (ServerException $e) {
             $response = json_decode((string) $e->getResponse()->getBody(), true);
-            $this->lastResponse = $response['ACResponse'];
+            self::$lastResponse = $response['ACResponse'];
             throw new \Exception($this->lastResponse['message']);
         
         } catch (ClientException $e) {
-            $this->lastResponse = [];
+            self::$lastResponse = [];
             throw new \Exception($e->getMessage());
              
         } finally {
@@ -175,14 +175,14 @@ class xAC
             }
         }
         
-        $this->lastResponse = $response;
+        self::$lastResponse = $response;
         
         return $response['body']['data'];
     }
     
-    public function getLastResponse()
+    public static function getLastResponse()
     {
-        return $this->lastResponse;
+        return self::$lastResponse;
     }
     
     public static function getInstance()

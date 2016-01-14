@@ -70,7 +70,7 @@ class Cursor
         $res = $this->client->call($uri, 'GET');
 
         // get and preserve pagination
-        $lr = $this->client->getLastResponse();
+        $lr = Client::getLastResponse();
         $this->pagination = isset($lr['body']) && isset($lr['body']['pagination']) ? $lr['body']['pagination'] : [];
         
         // convert array to Entities collection
