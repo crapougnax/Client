@@ -171,7 +171,7 @@ class xAC
         } finally {
             if (isset($res)) {
                 $response = json_decode((string) $res->getBody(), !self::$returnObject);
-                if ($response['code'])
+                //if ($response['code'])
                 $response = $response['ACResponse'];
             }
         }
