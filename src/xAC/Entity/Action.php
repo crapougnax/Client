@@ -50,7 +50,7 @@ class Action
                 $this->data
             );
         } catch (\Exception $e) {
-            var_dump($e->getMessage());
+            throw new \Exception($e->getMessage());
             return false;
         }
         

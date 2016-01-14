@@ -55,11 +55,7 @@ trait MagicFactoryTrait {
                     break;
             }
         } else {
-            die("can't find service definition for '$name'\n");
-            
-            var_dump($name);
-            var_Dump($arguments); 
-            die;                
+            throw new \Exception("can't find service definition for '$name'");
         }
     }
     
