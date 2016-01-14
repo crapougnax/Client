@@ -164,8 +164,9 @@ class xAC
             throw new \Exception($this->lastResponse['message']);
         
         } catch (ClientException $e) {
-            self::$lastResponse = [];
-            throw new \Exception($e->getMessage());
+            $response = json_decode((string) $e->getResponse()->getBody(), true);
+            self::$lastResponse = $response['ACResponse'];
+            throw new \Exception($this->lastResponse['message']);
              
         } finally {
             if (isset($res)) {
