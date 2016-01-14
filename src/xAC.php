@@ -147,17 +147,18 @@ class xAC
      */
     public function call($endpoint, $method = 'GET', array $data = [])
     {
+        $params = [];
+        if (count($data) > 0) {
+            $params['json'] = $data;
+        }
+        
         try {
             $this->initTransport();
             $res = $this->transport->request(
                 $method, 
                 $endpoint, 
-                [
-                    'json' => $data,
-                    
-                ]
+                $params
             );
-            
         } catch (ConnectException $e) {
             throw new \Exception($e->getMessage());
         
@@ -170,6 +171,7 @@ class xAC
         } finally {
             if (isset($res)) {
                 $response = json_decode((string) $res->getBody(), !self::$returnObject);
+                if ($response['code'])
                 $response = $response['ACResponse'];
             }
         }
@@ -194,7 +196,7 @@ class xAC
     }
     
     /**
-     * Instanciate new instance of HTTP transport
+     * Instanciate new HTTP transport instance
      */
     protected function initTransport()
     {
