@@ -50,7 +50,6 @@ class Action
                 $this->data
             );
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
             return false;
         }
         
