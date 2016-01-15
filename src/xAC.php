@@ -6,6 +6,8 @@ use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Exception\ClientException;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
 
 class xAC
@@ -53,6 +55,8 @@ class xAC
      * @var array
      */
     static protected $lastResponse = [];
+    
+    static protected $logger;
     
     /**
      * HTTP Transport
@@ -158,6 +162,8 @@ class xAC
      */
     public function call($endpoint, $method = 'GET', array $data = [])
     {
+        self::$logger->addInfo("Calling $method /api/$endpoint");
+            
         $params = [];
         if (count($data) > 0) {
             $params['json'] = $data;
@@ -167,18 +173,21 @@ class xAC
             $this->initTransport();
             $res = $this->transport->request($method, $endpoint, $params);
         } catch (ConnectException $e) {
+            self::$logger->addError($e->getMessage());
             throw new \Exception($e->getMessage());
         
         } catch (ServerException $e) {
             $response = json_decode((string) $e->getResponse()->getBody(), true);
             self::$lastResponse = $response['ACResponse'];
             self::$lastResponse['httpCode'] = $e->getResponse()->getStatusCode();
+            self::$logger->addError($e->getMessage());
             throw new \Exception(self::$lastResponse['message']);
         
         } catch (ClientException $e) {
             $response = json_decode((string) $e->getResponse()->getBody(), true);
             self::$lastResponse = $response['ACResponse'];
             self::$lastResponse['httpCode'] = $e->getResponse()->getStatusCode();
+            self::$logger->addError($e->getMessage());
             throw new \Exception(self::$lastResponse['message']);
              
         } finally {
@@ -211,6 +220,11 @@ class xAC
     {
         if (is_null(self::$client)) {
             self::$client = new self();
+            
+
+            // create a log channel
+            self::$logger = new Logger('xAC');
+            self::$logger->pushHandler(new StreamHandler('/tmp/xac-client.log', Logger::INFO));
         }
         
         return self::$client;
