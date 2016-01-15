@@ -162,6 +162,10 @@ class xAC
      */
     public function call($endpoint, $method = 'GET', array $data = [])
     {
+        if (substr($endpoint, -1) == '/') {
+            $endpoint = substr($endpoint, 0, strlen($endpoint)-1);
+        }
+        
         self::$logger = new Logger('xAC');
         self::$logger->pushHandler(new StreamHandler('/tmp/xac-client.log', Logger::INFO));
         
