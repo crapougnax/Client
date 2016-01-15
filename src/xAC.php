@@ -121,7 +121,7 @@ class xAC
         $path = sprintf('%s%sxac-services-%d.txt', sys_get_temp_dir(), DIRECTORY_SEPARATOR, self::$apiVersion);
         if ($refresh === true || ! file_exists($path)) {
             $client = new self;
-            $res = $client->call('endpoints?version=' . self::$apiVersion);
+            $res = $client->call('endpoints');
             file_put_contents($path, serialize($res));
             self::$services = $res;
         } else {
