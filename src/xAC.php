@@ -219,12 +219,11 @@ class xAC
     public static function getInstance()
     {
         if (is_null(self::$client)) {
-            self::$client = new self();
-            
-
             // create a log channel
             self::$logger = new Logger('xAC');
             self::$logger->pushHandler(new StreamHandler('/tmp/xac-client.log', Logger::INFO));
+            
+            self::$client = new self();
         }
         
         return self::$client;
