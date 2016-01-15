@@ -162,6 +162,9 @@ class xAC
      */
     public function call($endpoint, $method = 'GET', array $data = [])
     {
+        self::$logger = new Logger('xAC');
+        self::$logger->pushHandler(new StreamHandler('/tmp/xac-client.log', Logger::INFO));
+        
         self::$logger->addInfo("Calling $method /api/$endpoint");
             
         $params = [];
@@ -219,6 +222,7 @@ class xAC
     public static function getInstance()
     {
         if (is_null(self::$client)) {
+            
             // create a log channel
             self::$logger = new Logger('xAC');
             self::$logger->pushHandler(new StreamHandler('/tmp/xac-client.log', Logger::INFO));
