@@ -118,11 +118,10 @@ class xAC
      */
     public static function initServices($refresh = false)
     {
-        $path = '/tmp/xac-services.txt';
-        
+        $path = sprintf('%s%sxac-services-%d.txt', sys_get_temp_dir(), DIRECTORY_SEPARATOR, self::$apiVersion);
         if ($refresh === true || ! file_exists($path)) {
             $client = new self;
-            $res = $client->call('endpoints');
+            $res = $client->call('endpoints?version=' . self::$apiVersion);
             file_put_contents($path, serialize($res));
             self::$services = $res;
         } else {
