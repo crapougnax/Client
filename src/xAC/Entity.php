@@ -5,7 +5,7 @@ namespace Arrowsphere\Client\xAC;
 use Arrowsphere\Client\xAC as Client;
 
 /**
- * This class can be used as a cursor on a xAC API collection
+ * This class can be used as an entity wrapper on a xAC API object
  * 
  *
  */
@@ -13,14 +13,28 @@ class Entity
 {
     use MagicFactoryTrait;
     
+    /**
+     * Entity ID
+     * @var string
+     */
     protected $id;
     
+    /**
+     * Entity endpoint parameters
+     * @var array
+     */
     protected $params = [];
     
+    /**
+     * xAC Client
+     * @var Arrowsphere\Client\xAC
+     */
     protected $client;
     
-    protected $meta = [];
-    
+    /**
+     * Entity data
+     * @var array
+     */
     protected $data = [];
     
     
@@ -33,7 +47,10 @@ class Entity
  
     public function getBaseUri()
     {
-        return sprintf('%s/%s', $this->params['endpoint'], $this->id);
+        return sprintf('%s%s'
+            , $this->params['endpoint']
+            , ! empty($this->id) ? '/' . $this->id : null
+        );
     }
     
     public function getServices()
@@ -45,7 +62,7 @@ class Entity
     public function get()
     {
         if (! is_null($this->id) && count($this->data) == 0) {
-            $this->data = $this->client->call($this->getBaseUri(), 'GET');
+            $this->data = $this->client->call($this->getBaseUri());
         }
         
         return $this->data;

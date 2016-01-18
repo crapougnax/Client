@@ -11,16 +11,40 @@ use Arrowsphere\Client\xAC as Client;
  */
 class Cursor
 {
+    /**
+     * Cursor endpoint parameters
+     * @var array
+     */
     protected $params = [];
     
+    /**
+     * xAC Client instance
+     * @var Arrowsphere\Client\xAC
+     */
     protected $client;
     
+    /**
+     * Parent context of the collection if it is related to a particular entity
+     * @var Arrowsphere\Client\xAC\Entity
+     */
     protected $context;
     
+    /**
+     * Array of query filters
+     * @var array
+     */
     protected $filters = [];
     
+    /**
+     * Current page number, default value is 1
+     * @var integer
+     */
     protected $page = 1;
     
+    /**
+     * Number of results per page, default value is 15
+     * @var integer
+     */
     protected $perpage = 15;
     
     /**
@@ -60,14 +84,17 @@ class Cursor
             , $this->perpage
             );
         
+        // add filter if value is not empty
         foreach ($this->filters as $filter) {
-            $uri .= sprintf("&%s=%s"
-                , $filter['field']
-                , rawurlencode($filter['value'])
-                );
+            if (! empty($filter['value'])) {
+                $uri .= sprintf("&%s=%s"
+                    , $filter['field']
+                    , rawurlencode($filter['value'])
+                    );
+            }
         }
         
-        $res = $this->client->call($uri, 'GET');
+        $res = $this->client->call($uri);
 
         // get and preserve pagination
         $lr = Client::getLastResponse();
@@ -82,16 +109,27 @@ class Cursor
         return $_;
     }
     
+    /**
+     * Set page number, applied on next get() call
+     * @param integer $page
+     * @return \Arrowsphere\Client\xAC\Cursor
+     */
     public function setPage($page)
     {
-        $this->page = $page;
+        $this->page = (int) $page;
         return $this;
     }
     
+    /**
+     * Set per page value, reset page value to 1
+     * @param integer $perpage
+     * @return \Arrowsphere\Client\xAC\Cursor
+     */
     public function setPerPage($perpage)
     {
         if ($perpage > 0) {
             $this->perpage = (int) $perpage;
+            $this->page = 1;
         }
         
         return $this;
@@ -107,6 +145,13 @@ class Cursor
     }
     
     
+    /**
+     * Add a filter that will be passed to the API query
+     * @param string $field
+     * @param string $value
+     * @param string $operator
+     * @return \Arrowsphere\Client\xAC\Cursor
+     */
     public function addFilter($field, $value, $operator= '=')
     {
         $this->filter[] = [
@@ -118,12 +163,19 @@ class Cursor
         return $this;
     }
     
+    /**
+     * Remove filter matching given identifier or all filters if empty 
+     * @param string $field
+     * @return \Arrowsphere\Client\xAC\Cursor
+     */
     public function resetFilters($field = null)
     {
         if (is_null($field)) {
             $this->filters = [];
         } else {
-            
+            if (isset($this->filters[$field])) {
+                unset($this->filters[$field]);
+            }
         }
         
         return $this;
@@ -136,7 +188,6 @@ class Cursor
     public function next()
     {
         $this->page++;
-        
         return $this->get();
     }
 

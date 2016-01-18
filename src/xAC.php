@@ -10,8 +10,17 @@ use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
 
+/**
+ * xAC Client Facade class
+ * @author olivier@lepine.fr
+ *
+ */
 class xAC
 {
+    /**
+     * This trait provides a __staticCall() method to handle "magic" instances
+     * of Cursor() and Entity() classes
+     */
     use xAC\MagicFactoryTrait;
     
     /**
@@ -56,13 +65,31 @@ class xAC
      */
     static protected $lastResponse = [];
     
+    /**
+     * 
+     * @var Monolog\Logger;
+     */
     static protected $logger;
+    
+    /**
+     * Folder path where to write logs (with no trailing separator!)
+     * If this property is not setted, the temporary folder will be used
+     * @var string
+     */
+    static protected $logPath;
     
     /**
      * HTTP Transport
      * @var GuzzleHttp\Client
      */
     protected $transport;
+    
+    /**
+     * Time To Live of definitions files (one day per default)
+     * Set to zero while in dev mode to refresh on every call
+     * @var integer
+     */
+    public static $ttl = 86400;
     
     
     /**
@@ -110,10 +137,24 @@ class xAC
      */
     public static function setApiVersion($version)
     {
+        if (! self::$url) {
+            throw new \Exception("Please set API Base URL before changing version");
+        }
         if (! in_array($version, [1,2])) {
             throw new \Exception(sprintf("The %d version is not supported", $version));
         }
         self::$apiVersion = $version;
+        // Refresh services if version is changed
+        self::initServices();
+    }
+    
+    /**
+     * Define Log folder path (default is system temp folder)
+     * @param string $path
+     */
+    public static function setLogPath($path)
+    {
+        self::$logPath = $path;
     }
     
     /**
@@ -122,14 +163,27 @@ class xAC
      */
     public static function initServices($refresh = false)
     {
-        $path = sprintf('%s%sxac-services-%d.txt', sys_get_temp_dir(), DIRECTORY_SEPARATOR, self::$apiVersion);
+        // Define full definition file path
+        $path = sprintf('%s%sxac-services-v%d.conf'
+            , ! empty(self::$logPath) ? self::$logPath : sys_get_temp_dir()
+            , DIRECTORY_SEPARATOR
+            , self::$apiVersion
+            );
+        
         if ($refresh === true || ! file_exists($path)) {
+            self::log(sprintf("Refresh services definition on-demand for v%d API", self::$apiVersion));
             $client = new self;
             $res = $client->call('endpoints');
+            $res['_timestamp'] = time();
             file_put_contents($path, serialize($res));
             self::$services = $res;
         } else {
             self::$services = unserialize(file_get_contents($path));
+            // Check that content is not expired
+            if (time() - self::$services['_timestamp'] > self::$ttl) {
+                self::log(sprintf("Refresh outdated services definition for v%d API", self::$apiVersion));
+                self::initServices(true);
+            }
         }
     }
     
@@ -162,14 +216,15 @@ class xAC
      */
     public function call($endpoint, $method = 'GET', array $data = [])
     {
+<<<<<<< devel
         if (substr($endpoint, -1) == '/') {
             $endpoint = substr($endpoint, 0, strlen($endpoint)-1);
         }
         
-        self::$logger = new Logger('xAC');
-        self::$logger->pushHandler(new StreamHandler('/tmp/xac-client.log', Logger::INFO));
-        
+        self::log("Calling $method /api/$endpoint");
+=======
         self::$logger->addInfo("Calling $method /api/$endpoint");
+>>>>>>> 918a017 Dirty hack
             
         $params = [];
         if (count($data) > 0) {
@@ -180,27 +235,26 @@ class xAC
             $this->initTransport();
             $res = $this->transport->request($method, $endpoint, $params);
         } catch (ConnectException $e) {
-            self::$logger->addError($e->getMessage());
+            self::log($e->getMessage(), Logger::ERROR);
             throw new \Exception($e->getMessage());
         
         } catch (ServerException $e) {
             $response = json_decode((string) $e->getResponse()->getBody(), true);
             self::$lastResponse = $response['ACResponse'];
             self::$lastResponse['httpCode'] = $e->getResponse()->getStatusCode();
-            self::$logger->addError($e->getMessage());
+            self::log($e->getMessage(), Logger::ERROR);
             throw new \Exception(self::$lastResponse['message']);
         
         } catch (ClientException $e) {
             $response = json_decode((string) $e->getResponse()->getBody(), true);
             self::$lastResponse = $response['ACResponse'];
             self::$lastResponse['httpCode'] = $e->getResponse()->getStatusCode();
-            self::$logger->addError($e->getMessage());
+            self::log($e->getMessage(), Logger::ERROR);
             throw new \Exception(self::$lastResponse['message']);
              
         } finally {
             if (isset($res)) {
                 $response = json_decode((string) $res->getBody(), !self::$returnObject);
-                //if ($response['code'])
                 $response = $response['ACResponse'];
             }
         }
@@ -220,17 +274,39 @@ class xAC
     }
     
     /**
+     * Log messages to client log file
+     * @param string $message
+     * @param integer $level
+     * @return boolean
+     */
+    public static function log($message, $level = Logger::INFO)
+    {
+        if (! self::$logger) {
+            $logfile = sprintf('%s%sarrowsphere-client.log', sys_get_temp_dir(), DIRECTORY_SEPARATOR);
+            
+            // create a log channel
+            self::$logger = new Logger('xAC');
+            self::$logger->pushHandler(new StreamHandler($logfile, Logger::INFO));
+        }
+        
+        return self::$logger->addRecord($level, $message);
+    }
+    
+    
+    /**
      * Return a singleton instance of the class
      * @return Arrowsphere\Client\xAC
      */
     public static function getInstance()
     {
         if (is_null(self::$client)) {
-            
+<<<<<<< devel
+=======
             // create a log channel
             self::$logger = new Logger('xAC');
             self::$logger->pushHandler(new StreamHandler('/tmp/xac-client.log', Logger::INFO));
             
+>>>>>>> 918a017 Dirty hack
             self::$client = new self();
         }
         
